@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+
+{% block title %}Resume Analysis - Smart Resume Analyzer{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-5">
+        <div class="col-lg-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="mb-0" style="color: #6f4518;"><i class="fas fa-chart-bar"></i> Resume Analysis</h1>
+                <a href="{% url 'jobs' %}" class="btn coffee-btn-primary">
+                    <i class="fas fa-arrow-right"></i> View Job Matches
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resume Score Card -->
+    <div class="row mb-5">
+        <div class="col-lg-6">
+            <div class="card shadow-lg border-0 rounded-4 overflow-hidden h-100">
+                <div class="coffee-gradient text-white p-4">
+                    <h5 class="mb-0"><i class="fas fa-star"></i> Resume Score</h5>
+                </div>
+                <div class="card-body p-5 text-center">
+                    <div class="score-circle mx-auto mb-4" style="width: 150px; height: 150px;">
+                        <div class="d-flex align-items-center justify-content-center h-100">
+                            <div>
+                                <div class="score-value" style="font-size: 3rem; font-weight: bold; color: #d4a276;">
+                                    {{ score }}%
+                                </div>
+                                <small class="text-muted">Overall Score</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="progress" style="height: 25px; border-radius: 15px; background-color: #f3d5b5;">
+                        <div class="progress-bar coffee-gradient" role="progressbar" style="width: {{ score }}%; border-radius: 15px;" 
+                             aria-valuenow="{{ score }}" aria-valuemin="0" aria-valuemax="100">
+                            <span class="text-white fw-bold">{{ score }}%</span>
+                        </div>
+                    </div>
+                    <p class="mt-4 text-muted">
+                        {% if score >= 70 %}
+                            <i class="fas fa-thumbs-up" style="color: #28a745;"></i> Excellent resume profile!
+                        {% elif score >= 50 %}
+                            <i class="fas fa-thumbs-up" style="color: #ffc107;"></i> Good profile, room for improvement
+                        {% else %}
+                            <i class="fas fa-info-circle" style="color: #ff6b6b;"></i> Add more skills to improve
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card shadow-lg border-0 rounded-4 overflow-hidden h-100">
+                <div class="coffee-gradient text-white p-4">
+                    <h5 class="mb-0"><i class="fas fa-list-check"></i> Quick Stats</h5>
+                </div>
+                <div class="card-body p-5">
+                    <div class="row g-4">
+                        <div class="col-6">
+                            <div class="stat-box p-4 rounded-3" style="background-color: #ffedd8; border-left: 4px solid #d4a276;">
+                                <div style="font-size: 2rem; font-weight: bold; color: #d4a276;">{{ skill_count }}</div>
+                                <small class="text-muted">Skills Found</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-box p-4 rounded-3" style="background-color: #f3d5b5; border-left: 4px solid #bc8a5f;">
+                                <div style="font-size: 2rem; font-weight: bold; color: #bc8a5f;">{{ job_titles|length }}</div>
+                                <small class="text-muted">Job Roles Found</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Skills Section -->
+    <div class="row mb-5">
+        <div class="col-lg-12">
+            <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+                <div class="coffee-gradient text-white p-4">
+                    <h5 class="mb-0"><i class="fas fa-code"></i> Extracted Skills ({{ skill_count }})</h5>
+                </div>
+                <div class="card-body p-5">
+                    {% if skills %}
+                        <div class="skills-container">
+                            {% for skill in skills %}
+                                <span class="badge coffee-badge me-2 mb-2">
+                                    <i class="fas fa-check-circle"></i> {{ skill }}
+                                </span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center py-4">No skills found in your resume</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Job Roles Section -->
+    <div class="row mb-5">
+        <div class="col-lg-12">
+            <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+                <div class="coffee-gradient text-white p-4">
+                    <h5 class="mb-0"><i class="fas fa-briefcase"></i> Detected Job Roles</h5>
+                </div>
+                <div class="card-body p-5">
+                    {% if job_titles %}
+                        <div class="skills-container">
+                            {% for title in job_titles %}
+                                <span class="badge coffee-badge me-2 mb-2">
+                                    <i class="fas fa-star"></i> {{ title }}
+                                </span>
+                            {% endfor %}
+                        </div>
+                        <p class="text-muted mt-4 small">
+                            <i class="fas fa-info-circle"></i> We'll show you jobs matching these roles!
+                        </p>
+                    {% else %}
+                        <p class="text-muted text-center py-4">No specific job roles detected in your resume</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Missing Skills Section -->
+    <div class="row mb-5">
+        <div class="col-lg-12">
+            <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+                <div class="coffee-gradient text-white p-4">
+                    <h5 class="mb-0"><i class="fas fa-lightbulb"></i> Recommended Skills to Learn</h5>
+                </div>
+                <div class="card-body p-5">
+                    {% if missing_skills %}
+                        <div class="skills-container">
+                            {% for skill in missing_skills %}
+                                <span class="badge missing-skill-badge me-2 mb-2">
+                                    <i class="fas fa-plus-circle"></i> {{ skill }}
+                                </span>
+                            {% endfor %}
+                        </div>
+                        <p class="text-muted mt-4 small">
+                            <i class="fas fa-info-circle"></i> Learning these skills could significantly improve your job prospects!
+                        </p>
+                    {% else %}
+                        <p class="text-muted text-center py-4">You have all the recommended skills!</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="row">
+        <div class="col-lg-12 text-center">
+            <a href="{% url 'jobs' %}" class="btn btn-lg coffee-btn-primary me-3 mb-3">
+                <i class="fas fa-briefcase"></i> View Job Recommendations
+            </a>
+            <a href="{% url 'upload_resume' %}" class="btn btn-lg btn-outline-secondary mb-3">
+                <i class="fas fa-upload"></i> Upload Another Resume
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
