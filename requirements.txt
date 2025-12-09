@@ -2,4 +2,5 @@ Django
 PyMuPDF
 python-docx
 requests
-    
+gunicorn
+whitenoise
